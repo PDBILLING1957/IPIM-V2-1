@@ -1,0 +1,38 @@
+<!doctype html><html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17365d"><link rel="manifest" href="manifest.webmanifest">
+<title>IPIM V2.1</title>
+<style>
+body{margin:0;font:15px Arial;background:#f4f6f8;color:#17202a}header{background:#17365d;color:#fff;padding:16px}main{max-width:1100px;margin:auto;padding:16px}.card{background:#fff;padding:18px;margin-bottom:16px;border-radius:10px;box-shadow:0 2px 8px #0001}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}label{font-weight:bold;font-size:13px}input,textarea,select{width:100%;padding:10px;margin-top:5px;border:1px solid #bbc5cf;border-radius:6px;box-sizing:border-box}textarea{min-height:70px}.full{grid-column:1/-1}button{padding:11px 15px;border:0;border-radius:6px;font-weight:bold;margin:12px 6px 0 0}.save{background:#17365d;color:#fff}.new{background:#e6ebef}.danger{background:#b42318;color:#fff}.msg{padding:10px;margin-top:12px;border-radius:6px}.ok{background:#eaf7ec}.err{background:#fff0ef}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left}th{background:#f2f4f6}.pill{padding:4px 7px;border-radius:15px;background:#e8f6eb}.inactive{background:#ffe8e5}@media(max-width:700px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:480px){.grid{grid-template-columns:1fr}}
+</style></head><body>
+<header><b>IPIM V2.1</b><br>Customer Master — Final Foundation</header><main>
+<section class="card"><h2 id="title">New Customer</h2><div class="grid">
+<div><label>Customer ID</label><input id="id" readonly placeholder="Generated on Save"></div>
+<div><label>Customer / Company Name *</label><input id="name"></div><div><label>Contact Person</label><input id="contact"></div>
+<div><label>Mobile</label><input id="mobile"></div><div><label>WhatsApp</label><input id="whatsapp"></div><div><label>Email</label><input id="email" type="email"></div>
+<div class="full"><label>Billing Address</label><textarea id="billing"></textarea></div><div class="full"><label>Shipping Address</label><textarea id="shipping"></textarea></div>
+<div><label>GSTIN</label><input id="gstin"></div><div><label>State</label><input id="state"></div>
+<div><label>Credit Limit</label><input id="creditLimit" type="number" min="0" value="0"></div><div><label>Credit Days</label><input id="creditDays" type="number" min="0" value="0"></div>
+<div><label>Opening Outstanding</label><input id="opening" type="number" min="0" value="0"></div><div><label>Status</label><select id="active"><option value="1">Active</option><option value="0">Inactive</option></select></div>
+<div class="full"><label>Notes</label><textarea id="notes"></textarea></div></div>
+<button class="save" id="save">SAVE CUSTOMER</button><button class="new" id="new">NEW / CLEAR</button><button class="danger" id="deactivate" hidden>DEACTIVATE</button>
+<div id="msg"></div></section>
+<section class="card"><h2>Customer Master</h2><input id="search" placeholder="Search ID, company, mobile, GSTIN"><div style="overflow:auto"><table><thead><tr><th>ID</th><th>Company</th><th>Contact</th><th>Mobile</th><th>Status</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></section>
+</main>
+<script>
+const DB='IPIM_V21_FINAL',STORE='customers';let db,editing=null;
+const $=x=>document.getElementById(x),v=x=>$(x).value.trim(),sv=(x,y)=>$(x).value=y??'';
+function msg(t,ok=true){$('msg').textContent=t;$('msg').className='msg '+(ok?'ok':'err');}
+function openDB(){return new Promise((res,rej)=>{let r=indexedDB.open(DB,1);r.onupgradeneeded=e=>e.target.result.createObjectStore(STORE,{keyPath:'id'});r.onsuccess=e=>{db=e.target.result;res()};r.onerror=e=>rej(e.target.error)})}
+function all(){return new Promise((res,rej)=>{let r=db.transaction(STORE,'readonly').objectStore(STORE).getAll();r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function get(id){return new Promise((res,rej)=>{let r=db.transaction(STORE,'readonly').objectStore(STORE).get(id);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function put(x){return new Promise((res,rej)=>{let r=db.transaction(STORE,'readwrite').objectStore(STORE).put(x);r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
+async function next(){let a=await all(),m=0;a.forEach(x=>{let n=+String(x.id).slice(4);if(n>m)m=n});return'CUS-'+String(m+1).padStart(6,'0')}
+function data(){return{name:v('name'),contact:v('contact'),mobile:v('mobile'),whatsapp:v('whatsapp'),email:v('email'),billing:v('billing'),shipping:v('shipping'),gstin:v('gstin'),state:v('state'),creditLimit:+$('creditLimit').value||0,creditDays:+$('creditDays').value||0,opening:+$('opening').value||0,active:$('active').value==='1',notes:v('notes')}}
+async function save(){try{let x=data();if(!x.name)return msg('Customer / Company Name is required.',false);let a=await all(),d=a.find(r=>r.id!==editing&&((x.mobile&&r.mobile===x.mobile)||(x.email&&r.email&&r.email.toLowerCase()===x.email.toLowerCase())||(x.gstin&&r.gstin&&r.gstin.toLowerCase()===x.gstin.toLowerCase())));if(d)return msg('Possible duplicate: '+d.id+' — '+d.name,false);let now=new Date().toISOString();if(editing){let old=await get(editing);x.id=editing;x.createdAt=old.createdAt;x.updatedAt=now;await put(x);msg('Saved. ID remains '+editing)}else{x.id=await next();x.createdAt=now;x.updatedAt=now;await put(x);editing=x.id;sv('id',x.id);$('title').textContent='Edit Customer — '+x.id;$('deactivate').hidden=false;msg('CUSTOMER SAVED — '+x.id)}render()}catch(e){msg('Save error: '+e,false)}}
+function clear(){editing=null;$('title').textContent='New Customer';['id','name','contact','mobile','whatsapp','email','billing','shipping','gstin','state','notes'].forEach(x=>sv(x,''));['creditLimit','creditDays','opening'].forEach(x=>sv(x,'0'));sv('active','1');$('deactivate').hidden=true;$('msg').className='';$('msg').textContent=''}
+async function edit(id){let x=await get(id);editing=id;$('title').textContent='Edit Customer — '+id;Object.keys(x).forEach(k=>$(k)&&sv(k,x[k]));sv('active',x.active?'1':'0');$('deactivate').hidden=false;window.scrollTo(0,0)}
+async function deactivate(){if(!editing)return;let x=await get(editing);x.active=false;x.updatedAt=new Date().toISOString();await put(x);sv('active','0');msg('Customer '+editing+' is inactive. ID retained permanently.');render()}
+async function render(){let q=v('search').toLowerCase(),a=(await all()).filter(x=>JSON.stringify(x).toLowerCase().includes(q));$('rows').innerHTML=a.length?a.map(x=>`<tr><td>${x.id}</td><td>${x.name}</td><td>${x.contact}</td><td>${x.mobile}</td><td><span class="pill ${x.active?'':'inactive'}">${x.active?'Active':'Inactive'}</span></td><td><button class="new" onclick="edit('${x.id}')">EDIT</button></td></tr>`).join(''):'<tr><td colspan="6">No customers saved.</td></tr>'}
+$('save').onclick=save;$('new').onclick=clear;$('deactivate').onclick=deactivate;$('search').oninput=render;openDB().then(render).catch(e=>msg('Database error: '+e,false));
+</script><script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script></body></html>
