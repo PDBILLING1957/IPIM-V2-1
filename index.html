@@ -1,38 +1,84 @@
 <!doctype html><html><head>
+<meta charset="utf-8"><meta name="viewport" content<!doctype html>
+<html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#17365d"><link rel="manifest" href="manifest.webmanifest">
-<title>IPIM V2.1</title>
+<meta name="theme-color" content="#17324d"><link rel="manifest" href="./manifest.webmanifest">
+<title>IPIM V2.2</title>
 <style>
-body{margin:0;font:15px Arial;background:#f4f6f8;color:#17202a}header{background:#17365d;color:#fff;padding:16px}main{max-width:1100px;margin:auto;padding:16px}.card{background:#fff;padding:18px;margin-bottom:16px;border-radius:10px;box-shadow:0 2px 8px #0001}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}label{font-weight:bold;font-size:13px}input,textarea,select{width:100%;padding:10px;margin-top:5px;border:1px solid #bbc5cf;border-radius:6px;box-sizing:border-box}textarea{min-height:70px}.full{grid-column:1/-1}button{padding:11px 15px;border:0;border-radius:6px;font-weight:bold;margin:12px 6px 0 0}.save{background:#17365d;color:#fff}.new{background:#e6ebef}.danger{background:#b42318;color:#fff}.msg{padding:10px;margin-top:12px;border-radius:6px}.ok{background:#eaf7ec}.err{background:#fff0ef}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left}th{background:#f2f4f6}.pill{padding:4px 7px;border-radius:15px;background:#e8f6eb}.inactive{background:#ffe8e5}@media(max-width:700px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:480px){.grid{grid-template-columns:1fr}}
-</style></head><body>
-<header><b>IPIM V2.1</b><br>Customer Master — Final Foundation</header><main>
-<section class="card"><h2 id="title">New Customer</h2><div class="grid">
-<div><label>Customer ID</label><input id="id" readonly placeholder="Generated on Save"></div>
-<div><label>Customer / Company Name *</label><input id="name"></div><div><label>Contact Person</label><input id="contact"></div>
-<div><label>Mobile</label><input id="mobile"></div><div><label>WhatsApp</label><input id="whatsapp"></div><div><label>Email</label><input id="email" type="email"></div>
-<div class="full"><label>Billing Address</label><textarea id="billing"></textarea></div><div class="full"><label>Shipping Address</label><textarea id="shipping"></textarea></div>
-<div><label>GSTIN</label><input id="gstin"></div><div><label>State</label><input id="state"></div>
-<div><label>Credit Limit</label><input id="creditLimit" type="number" min="0" value="0"></div><div><label>Credit Days</label><input id="creditDays" type="number" min="0" value="0"></div>
-<div><label>Opening Outstanding</label><input id="opening" type="number" min="0" value="0"></div><div><label>Status</label><select id="active"><option value="1">Active</option><option value="0">Inactive</option></select></div>
-<div class="full"><label>Notes</label><textarea id="notes"></textarea></div></div>
-<button class="save" id="save">SAVE CUSTOMER</button><button class="new" id="new">NEW / CLEAR</button><button class="danger" id="deactivate" hidden>DEACTIVATE</button>
-<div id="msg"></div></section>
-<section class="card"><h2>Customer Master</h2><input id="search" placeholder="Search ID, company, mobile, GSTIN"><div style="overflow:auto"><table><thead><tr><th>ID</th><th>Company</th><th>Contact</th><th>Mobile</th><th>Status</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></section>
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fa;color:#1f2933}
+header{background:#17324d;color:white;padding:15px}h1{font-size:19px;margin:0}.sub{font-size:12px;opacity:.8;margin-top:3px}
+nav{display:flex;gap:8px;padding:10px;background:white;border-bottom:1px solid #d9e0e7;overflow:auto}
+button{border:0;border-radius:8px;padding:11px 14px;cursor:pointer}.tab{background:white;border:1px solid #d9e0e7}.active,.primary{background:#17324d;color:white}
+main{max-width:1100px;margin:auto;padding:12px}.card{background:white;border:1px solid #d9e0e7;border-radius:12px;padding:15px;margin-bottom:13px}
+h2{font-size:17px;margin:0 0 12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{font-size:12px;color:#667085;display:block;margin-bottom:5px}
+input,select,textarea{width:100%;box-sizing:border-box;padding:11px;border:1px solid #cfd6de;border-radius:8px;font-size:16px}textarea{min-height:70px}
+.idbox{background:#eef4f8;border:1px solid #cbd8e2;padding:12px;border-radius:8px;font-weight:bold}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.danger{background:#a52a2a;color:white}.notice{padding:10px;border-radius:8px;background:#edf7f1;color:#19734a;margin-bottom:12px}.error{background:#fff0f0;color:#a52a2a}
+.hidden{display:none}.small{font-size:12px;color:#667085}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;border-bottom:1px solid #d9e0e7;text-align:left;white-space:nowrap}th{background:#f7f9fb}.pill{background:#edf2f6;border-radius:15px;padding:3px 7px;font-size:11px}
+.barcode{font-family:monospace;letter-spacing:1px;font-size:17px;word-break:break-all;text-align:center;padding:12px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><h1>IPIM Business Management System V2.2</h1><div class="sub">Customer Master + Product Master Stage 1</div></header>
+<nav><button id="tc" class="tab active">Customer Master</button><button id="tp" class="tab">Product Master</button></nav>
+<main>
+<section id="cv"><div class="card"><h2>Customer Master</h2><div id="cm" class="notice hidden"></div>
+<div class="grid">
+<div><label>Customer ID</label><div id="cid" class="idbox">New customer — ID generated on Save</div></div>
+<div><label>Status</label><select id="cstatus"><option>Active</option><option>Inactive</option></select></div>
+<div><label>Customer / Company Name *</label><input id="cname"></div><div><label>Contact Person</label><input id="ccontact"></div>
+<div><label>Mobile</label><input id="cmobile"></div><div><label>WhatsApp</label><input id="cwhatsapp"></div>
+<div><label>Email</label><input id="cemail"></div><div><label>GSTIN</label><input id="cgstin"></div>
+<div><label>State</label><input id="cstate"></div><div><label>Credit Limit</label><input id="climit" type="number"></div>
+<div><label>Credit Days</label><input id="cdays" type="number"></div><div><label>Opening Outstanding</label><input id="copen" type="number"></div>
+<div><label>Billing Address</label><textarea id="cbill"></textarea></div><div><label>Shipping Address</label><textarea id="cship"></textarea></div>
+<div style="grid-column:1/-1"><label>Notes</label><textarea id="cnotes"></textarea></div></div>
+<div class="actions"><button class="primary" id="csave">Save Customer</button><button id="cnew">New / Clear</button><button class="danger" id="cdeact">Deactivate</button></div></div>
+<div class="card"><h2>Customer List</h2><input id="csearch" placeholder="Search customer, mobile, email or ID"><div class="tablewrap"><table><thead><tr><th>ID</th><th>Customer</th><th>Contact</th><th>Mobile</th><th>Status</th><th></th></tr></thead><tbody id="crows"></tbody></table></div></div></section>
+
+<section id="pv" class="hidden"><div class="card"><h2>Product Master — Stage 1</h2><div id="pm" class="notice hidden"></div>
+<div class="small">Product ID is the permanent IPIM identity. If no manufacturer barcode is supplied, the IPIM barcode value is the Product ID.</div><br>
+<div class="grid">
+<div><label>Product ID</label><div id="pid" class="idbox">New product — ID generated on Save</div></div><div><label>Status</label><select id="pstatus"><option>Active</option><option>Inactive</option></select></div>
+<div><label>Product Name *</label><input id="pname"></div><div><label>Category</label><input id="pcat"></div>
+<div><label>Sub-category</label><input id="psub"></div><div><label>Unit</label><input id="punit" placeholder="PCS / KG / MTR / ROLL"></div>
+<div><label>Manufacturer / Supplier Barcode (optional)</label><input id="pext"></div><div><label>Purchase Rate</label><input id="ppur" type="number"></div>
+<div><label>Selling Rate</label><input id="psell" type="number"></div><div><label>GST %</label><input id="pgst" type="number"></div>
+<div><label>HSN / SAC</label><input id="phsn"></div><div><label>Opening Stock</label><input id="popen" type="number"></div>
+<div><label>Minimum Stock</label><input id="pmin" type="number"></div>
+<div style="grid-column:1/-1"><label>Notes</label><textarea id="pnotes"></textarea></div></div>
+<div class="actions"><button class="primary" id="psave">Save Product</button><button id="pnew">New / Clear</button><button class="danger" id="pdeact">Deactivate</button></div></div>
+<div class="card"><h2>Barcode</h2><div id="btext" class="idbox">Barcode will appear after Product Save</div><div id="bvisual" class="barcode"></div><div class="small">Stage 1 links the IPIM barcode value to the Product ID. Camera/external-scanner workflow will use this identity in transaction stages.</div></div>
+<div class="card"><h2>Product List</h2><input id="psearch" placeholder="Search product, ID, category or barcode"><div class="tablewrap"><table><thead><tr><th>ID</th><th>Product</th><th>Category</th><th>Barcode</th><th>Unit</th><th>Status</th><th></th></tr></thead><tbody id="prows"></tbody></table></div></div></section>
 </main>
 <script>
-const DB='IPIM_V21_FINAL',STORE='customers';let db,editing=null;
-const $=x=>document.getElementById(x),v=x=>$(x).value.trim(),sv=(x,y)=>$(x).value=y??'';
-function msg(t,ok=true){$('msg').textContent=t;$('msg').className='msg '+(ok?'ok':'err');}
-function openDB(){return new Promise((res,rej)=>{let r=indexedDB.open(DB,1);r.onupgradeneeded=e=>e.target.result.createObjectStore(STORE,{keyPath:'id'});r.onsuccess=e=>{db=e.target.result;res()};r.onerror=e=>rej(e.target.error)})}
-function all(){return new Promise((res,rej)=>{let r=db.transaction(STORE,'readonly').objectStore(STORE).getAll();r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
-function get(id){return new Promise((res,rej)=>{let r=db.transaction(STORE,'readonly').objectStore(STORE).get(id);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
-function put(x){return new Promise((res,rej)=>{let r=db.transaction(STORE,'readwrite').objectStore(STORE).put(x);r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
-async function next(){let a=await all(),m=0;a.forEach(x=>{let n=+String(x.id).slice(4);if(n>m)m=n});return'CUS-'+String(m+1).padStart(6,'0')}
-function data(){return{name:v('name'),contact:v('contact'),mobile:v('mobile'),whatsapp:v('whatsapp'),email:v('email'),billing:v('billing'),shipping:v('shipping'),gstin:v('gstin'),state:v('state'),creditLimit:+$('creditLimit').value||0,creditDays:+$('creditDays').value||0,opening:+$('opening').value||0,active:$('active').value==='1',notes:v('notes')}}
-async function save(){try{let x=data();if(!x.name)return msg('Customer / Company Name is required.',false);let a=await all(),d=a.find(r=>r.id!==editing&&((x.mobile&&r.mobile===x.mobile)||(x.email&&r.email&&r.email.toLowerCase()===x.email.toLowerCase())||(x.gstin&&r.gstin&&r.gstin.toLowerCase()===x.gstin.toLowerCase())));if(d)return msg('Possible duplicate: '+d.id+' — '+d.name,false);let now=new Date().toISOString();if(editing){let old=await get(editing);x.id=editing;x.createdAt=old.createdAt;x.updatedAt=now;await put(x);msg('Saved. ID remains '+editing)}else{x.id=await next();x.createdAt=now;x.updatedAt=now;await put(x);editing=x.id;sv('id',x.id);$('title').textContent='Edit Customer — '+x.id;$('deactivate').hidden=false;msg('CUSTOMER SAVED — '+x.id)}render()}catch(e){msg('Save error: '+e,false)}}
-function clear(){editing=null;$('title').textContent='New Customer';['id','name','contact','mobile','whatsapp','email','billing','shipping','gstin','state','notes'].forEach(x=>sv(x,''));['creditLimit','creditDays','opening'].forEach(x=>sv(x,'0'));sv('active','1');$('deactivate').hidden=true;$('msg').className='';$('msg').textContent=''}
-async function edit(id){let x=await get(id);editing=id;$('title').textContent='Edit Customer — '+id;Object.keys(x).forEach(k=>$(k)&&sv(k,x[k]));sv('active',x.active?'1':'0');$('deactivate').hidden=false;window.scrollTo(0,0)}
-async function deactivate(){if(!editing)return;let x=await get(editing);x.active=false;x.updatedAt=new Date().toISOString();await put(x);sv('active','0');msg('Customer '+editing+' is inactive. ID retained permanently.');render()}
-async function render(){let q=v('search').toLowerCase(),a=(await all()).filter(x=>JSON.stringify(x).toLowerCase().includes(q));$('rows').innerHTML=a.length?a.map(x=>`<tr><td>${x.id}</td><td>${x.name}</td><td>${x.contact}</td><td>${x.mobile}</td><td><span class="pill ${x.active?'':'inactive'}">${x.active?'Active':'Inactive'}</span></td><td><button class="new" onclick="edit('${x.id}')">EDIT</button></td></tr>`).join(''):'<tr><td colspan="6">No customers saved.</td></tr>'}
-$('save').onclick=save;$('new').onclick=clear;$('deactivate').onclick=deactivate;$('search').oninput=render;openDB().then(render).catch(e=>msg('Database error: '+e,false));
-</script><script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script></body></html>
+const DB='IPIM_V21_FINAL',VER=2;let db,customers=[],products=[],ce=null,pe=null;
+const $=x=>document.getElementById(x), v=x=>$(x).value.trim(), n=x=>Number($(x).value)||0;
+function openDB(){return new Promise((ok,no)=>{let r=indexedDB.open(DB,VER);r.onupgradeneeded=e=>{let d=e.target.result;if(!d.objectStoreNames.contains('customers'))d.createObjectStore('customers',{keyPath:'id'});if(!d.objectStoreNames.contains('products'))d.createObjectStore('products',{keyPath:'id'});if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'key'})};r.onsuccess=e=>{db=e.target.result;ok()};r.onerror=()=>no(r.error)})}
+function store(s,m='readonly'){return db.transaction(s,m).objectStore(s)}
+function all(s){return new Promise((ok,no)=>{let r=store(s).getAll();r.onsuccess=()=>ok(r.result||[]);r.onerror=()=>no(r.error)})}
+function meta(k){return new Promise((ok,no)=>{let r=store('meta').get(k);r.onsuccess=()=>ok(r.result?.value);r.onerror=()=>no(r.error)})}
+function setmeta(k,x){return new Promise((ok,no)=>{let r=store('meta','readwrite').put({key:k,value:x});r.onsuccess=ok;r.onerror=()=>no(r.error)})}
+async function next(kind){let st=kind==='CUS'?'customers':'products',a=await all(st),m=0,prefix=kind+'-';a.forEach(x=>{let s=String(x.id||'');if(s.startsWith(prefix)){let z=parseInt(s.slice(prefix.length),10);if(z>m)m=z}});return prefix+String(m+1).padStart(6,'0')}
+function msg(id,t,err=false){let e=$(id);e.textContent=t;e.className='notice'+(err?' error':'');setTimeout(()=>e.classList.add('hidden'),3000)}
+function put(s,o){return new Promise((ok,no)=>{let r=store(s,'readwrite').put(o);r.onsuccess=ok;r.onerror=()=>no(r.error)})}
+async function load(){customers=await all('customers');products=await all('products');customers.sort((a,b)=>a.id.localeCompare(b.id));products.sort((a,b)=>a.id.localeCompare(b.id));renderC();renderP()}
+function clearC(){ce=null;$('cid').textContent='New customer — ID generated on Save';['cname','ccontact','cmobile','cwhatsapp','cemail','cgstin','cstate','climit','cdays','copen','cbill','cship','cnotes'].forEach(x=>$(x).value='');$('cstatus').value='Active'}
+async function saveC(){if(!v('cname'))return msg('cm','Customer / Company Name is required',true);if(!ce)ce=await next('CUS');let o={id:ce,name:v('cname'),contact:v('ccontact'),mobile:v('cmobile'),whatsapp:v('cwhatsapp'),email:v('cemail'),gstin:v('cgstin'),state:v('cstate'),creditLimit:n('climit'),creditDays:n('cdays'),opening:n('copen'),billing:v('cbill'),shipping:v('cship'),notes:v('cnotes'),status:$('cstatus').value,active:$('cstatus').value==='Active'};await put('customers',o);$('cid').textContent=ce;msg('cm','Saved '+ce);await load()}
+function renderC(){let q=v('csearch').toLowerCase();$('crows').innerHTML=customers.filter(x=>(x.id+' '+x.name+' '+x.contact+' '+x.mobile+' '+x.email).toLowerCase().includes(q)).map(x=>'<tr><td>'+x.id+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.contact)+'</td><td>'+esc(x.mobile)+'</td><td><span class="pill">'+(x.status||((x.active===false)?'Inactive':'Active'))+'</span></td><td><button onclick="openC(\''+x.id+'\')">Open</button></td></tr>').join('')||'<tr><td colspan="6">No customers found.</td></tr>'}
+window.openC=id=>{let x=customers.find(a=>a.id===id);if(!x)return;ce=id;$('cid').textContent=id;[['cname','name'],['ccontact','contact'],['cmobile','mobile'],['cwhatsapp','whatsapp'],['cemail','email'],['cgstin','gstin'],['cstate','state'],['climit','creditLimit'],['cdays','creditDays'],['copen','opening'],['cbill','billing'],['cship','shipping'],['cnotes','notes']].forEach(a=>$(a[0]).value=x[a[1]]??'');$('cstatus').value=x.status||((x.active===false)?'Inactive':'Active')}
+async function deactC(){if(!ce)return;let x=customers.find(a=>a.id===ce);if(!x)return;x.status='Inactive';await put('customers',x);await load()}
+function clearP(){pe=null;$('pid').textContent='New product — ID generated on Save';$('btext').textContent='Barcode will appear after Product Save';$('bvisual').textContent='';['pname','pcat','psub','punit','pext','ppur','psell','pgst','phsn','popen','pmin','pnotes'].forEach(x=>$(x).value='');$('pstatus').value='Active'}
+async function saveP(){if(!v('pname'))return msg('pm','Product Name is required',true);if(!pe)pe=await next('PRD');let ext=v('pext'),bc=ext||pe,o={id:pe,name:v('pname'),category:v('pcat'),sub:v('psub'),unit:v('punit'),externalBarcode:ext,barcode:bc,purchase:n('ppur'),selling:n('psell'),gst:n('pgst'),hsn:v('phsn'),opening:n('popen'),minimum:n('pmin'),notes:v('pnotes'),status:$('pstatus').value};await put('products',o);$('pid').textContent=pe;$('btext').textContent='IPIM Barcode: '+bc;$('bvisual').textContent=barcodeLook(bc);msg('pm','Saved '+pe);await load()}
+function barcodeLook(s){let z='|';for(let c of s){let q=c.charCodeAt(0);for(let i=0;i<5;i++)z+=(q>>i&1)?'▮':'▯';z+='|'}return z}
+function renderP(){let q=v('psearch').toLowerCase();$('prows').innerHTML=products.filter(x=>(x.id+' '+x.name+' '+x.category+' '+x.barcode).toLowerCase().includes(q)).map(x=>'<tr><td>'+x.id+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.barcode)+'</td><td>'+esc(x.unit)+'</td><td><span class="pill">'+(x.status||((x.active===false)?'Inactive':'Active'))+'</span></td><td><button onclick="openP(\''+x.id+'\')">Open</button></td></tr>').join('')||'<tr><td colspan="7">No products found.</td></tr>'}
+window.openP=id=>{let x=products.find(a=>a.id===id);if(!x)return;pe=id;$('pid').textContent=id;$('btext').textContent='IPIM Barcode: '+x.barcode;$('bvisual').textContent=barcodeLook(x.barcode);[['pname','name'],['pcat','category'],['psub','sub'],['punit','unit'],['pext','externalBarcode'],['ppur','purchase'],['psell','selling'],['pgst','gst'],['phsn','hsn'],['popen','opening'],['pmin','minimum'],['pnotes','notes']].forEach(a=>$(a[0]).value=x[a[1]]??'');$('pstatus').value=x.status||'Active'}
+async function deactP(){if(!pe)return;let x=products.find(a=>a.id===pe);if(!x)return;x.status='Inactive';await put('products',x);await load()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+$('tc').onclick=()=>{$('cv').classList.remove('hidden');$('pv').classList.add('hidden');$('tc').classList.add('active');$('tp').classList.remove('active')}
+$('tp').onclick=()=>{$('pv').classList.remove('hidden');$('cv').classList.add('hidden');$('tp').classList.add('active');$('tc').classList.remove('active')}
+$('csave').onclick=saveC;$('cnew').onclick=clearC;$('cdeact').onclick=deactC;$('psave').onclick=saveP;$('pnew').onclick=clearP;$('pdeact').onclick=deactP;
+$('csearch').oninput=renderC;$('psearch').oninput=renderP;
+(async()=>{await openDB();await load()})()
+</script></body></html>
